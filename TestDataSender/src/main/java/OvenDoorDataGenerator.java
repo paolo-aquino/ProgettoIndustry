@@ -21,7 +21,7 @@ public class OvenDoorDataGenerator {
 
             // 10 % probability that the data point is not valid
             double rnd = Math.random();
-            boolean is_okay = rnd >= 0.5;
+            boolean is_okay = rnd >= 0.1;
 
             Point point = Point
                     .measurement("oven_door")
