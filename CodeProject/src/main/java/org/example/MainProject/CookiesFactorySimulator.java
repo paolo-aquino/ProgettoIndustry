@@ -1,0 +1,147 @@
+package org.example.MainProject;
+
+import com.influxdb.client.InfluxDBClient;
+import com.influxdb.client.InfluxDBClientFactory;
+import com.influxdb.client.WriteApiBlocking;
+import com.influxdb.client.domain.WritePrecision;
+import org.example.MyLibrary.*;
+import org.iot.raspberry.grovepi.GrovePi;
+import org.iot.raspberry.grovepi.pi4j.GrovePi4J;
+
+import com.influxdb.client.write.Point;
+
+import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+enum Speed {
+    FAST("high_speed"),
+    SLOW("low_speed");
+
+    private final String name;
+
+    Speed(String name) {
+        this.name = name;
+    }
+
+    @Override
+    public String toString() {
+        return name;
+    }
+}
+
+class CookiesFactory {
+
+    // Speed fields
+    private static final int DEFAULT_DISTANCE = 10;
+    private static final double RADIUS = 0.04;
+    private static final double CIRCUMFERENCE = 2 * Math.PI * RADIUS;
+    private static final double DEFAULT_SPEED = 0.5;
+
+    private boolean firstRotation;
+    private boolean readingValue;
+    private long startTime;
+    private long rpmTimeStart;
+    private int rotations;
+    private Speed speed;
+
+    public CookiesFactory() {
+        firstRotation = true;
+        readingValue = false;
+        startTime = 0;
+        rpmTimeStart = 0;
+        rotations = 0;
+        speed = Speed.SLOW;
+    }
+
+    public void speedCalculator(final SupsiUltrasonicRanger ranger, final WriteApiBlocking writeApi) {
+        if(firstRotation) {
+            if (ranger.isValid() && ranger.getValue() <= DEFAULT_DISTANCE) {
+                readingValue = true;
+            } else if (readingValue) {
+                if(ranger.isValid() && ranger.getValue() > DEFAULT_DISTANCE) {
+                    startTime = System.currentTimeMillis();
+                    firstRotation = false;
+                    readingValue = false;
+
+                    rpmTimeStart = startTime;
+                }
+            }
+        } else {
+            if(ranger.isValid() && ranger.getValue() <= DEFAULT_DISTANCE) {
+                readingValue = true;
+            } else if (readingValue) {
+                if(ranger.isValid() && ranger.getValue() > DEFAULT_DISTANCE) {
+                    long endTime = System.currentTimeMillis();
+                    long diff = endTime - startTime;
+
+                    double time = diff /1000.0;
+                    speed = (CIRCUMFERENCE/time) > DEFAULT_SPEED ? Speed.SLOW : Speed.FAST;
+
+                    startTime = System.currentTimeMillis();
+                    readingValue = false;
+
+                    rotations++;
+                    if(endTime - rpmTimeStart >= 60_000){
+                        Point speedPoint = Point.measurement("conveyor_speed").addField("speed", rotations)
+                                        .addTag("speed_cat", speed.toString()).time(Instant.now(), WritePrecision.MS);
+                        writeApi.writePoint(CookiesFactorySimulator.BUCKET, CookiesFactorySimulator.ORG, speedPoint);
+
+                        rotations = 0;
+                        rpmTimeStart = System.currentTimeMillis();
+                    }
+                }
+            }
+        }
+    }
+}
+
+
+public class CookiesFactorySimulator {
+    private static boolean acquisitionON = true;
+
+    public static String BUCKET = "Grafana";
+    public static String ORG = "Supsi";
+
+    final private static List<SupsiMonitor<?>> sensors = new ArrayList<>();
+
+    private static void addSensorMonitored(SupsiMonitor<?> sensorMonitor){
+        sensors.add(sensorMonitor);
+    }
+
+    /**
+     * All sensors in list will stop monitoring
+     */
+    private static void stopAll() {
+        for (SupsiMonitor<?> sensor : sensors)
+            sensor.stop();
+    }
+
+    public static void main(String[] args) throws Exception {
+        Logger.getLogger("GrovePi").setLevel(Level.WARNING);
+        Logger.getLogger("RaspberryPi").setLevel(Level.WARNING);
+
+        String token = "b21xsGBINmFAwno-66qgvc7EgfSTQbMRoEvjRCW-Z39XNa4mTJLwjeaGNJ1tj5snuPgkhwGkAMgSIDxHjkSb2Q==";
+        InfluxDBClient client = InfluxDBClientFactory.create("http://169.254.201.100:8086", token.toCharArray());
+        WriteApiBlocking writeApi = client.getWriteApiBlocking();
+
+        CookiesFactory factory = new CookiesFactory();
+
+        // Raspberry - Gp1
+        GrovePi grovePi = new GrovePi4J();
+
+        // LCD display - I2C port
+        @SuppressWarnings("resource")
+        SupsiRgbLcd lcd = new SupsiRgbLcd();
+
+        SupsiUltrasonicRanger ranger = new SupsiUltrasonicRanger(grovePi, 7);
+
+
+        while(true){
+            factory.speedCalculator(ranger, writeApi);
+        }
+
+    }
+}

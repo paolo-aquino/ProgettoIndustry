@@ -15,8 +15,8 @@ public class RotationSpeedTest {
 
 
     public static void main(String[] args) throws Exception{
-        Logger.getLogger("GrovePi").setLevel(Level.SEVERE);
-        Logger.getLogger("RaspberryPi").setLevel(Level.SEVERE);
+        Logger.getLogger("GrovePi").setLevel(Level.OFF);
+        Logger.getLogger("RaspberryPi").setLevel(Level.OFF);
 
         GrovePi grovepi = new GrovePi4J();
 

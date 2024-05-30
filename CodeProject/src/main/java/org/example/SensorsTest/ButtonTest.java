@@ -18,7 +18,6 @@ public class ButtonTest {
         Logger.getLogger("RaspberryPi").setLevel(Level.SEVERE);
 
 
-
         GrovePi grovePi = new GrovePi4J();
         GroveButton button = new GroveButton(grovePi, BUTTON_PIN);
         SensorMonitor<Boolean> buttonMonitor = new SensorMonitor(button, 100);
@@ -43,5 +42,7 @@ public class ButtonTest {
         };
         button.setButtonListener(buttonListener);
         buttonMonitor.start();
+
+        while(true);
     }
 }
