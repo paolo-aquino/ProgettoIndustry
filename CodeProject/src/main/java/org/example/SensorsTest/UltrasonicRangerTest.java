@@ -21,7 +21,7 @@ public class UltrasonicRangerTest {
 
         //SupsiRgbLcd lcd = new SupsiRgbLcd();
         SupsiUltrasonicRanger ranger = new SupsiUltrasonicRanger(grovepi, 3);
-        SupsiUltrasonicRanger ranger2 = new SupsiUltrasonicRanger(grovepi, 2);
+        //SupsiUltrasonicRanger ranger2 = new SupsiUltrasonicRanger(grovepi, 2);
 
         boolean firstRotation = true;
         boolean readingValue = false;
