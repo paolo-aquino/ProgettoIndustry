@@ -22,19 +22,29 @@ public interface SupsiMonitor<R> {
     }
 
     /**
-     * Checks if the monitor is running.
-     * @return True if the monitor is running, false otherwise.
-     */
-    default boolean isRunning() {
-        return getSensorMonitor().isRunning();
-    }
-
-    /**
      * Retrieves the current sensor value.
      * @return The current sensor value.
      */
     default R getValue() {
         return getSensorMonitor().getValue();
+    }
+
+    /**
+     * Checks if the current value is valid and retrieves it
+     * @return The current sensor value or null
+     */
+    default R getValidValue() {
+        if (isValid())
+            return getValue();
+        return null;
+    }
+
+    /**
+     * Checks if the monitor is running.
+     * @return True if the monitor is running, false otherwise.
+     */
+    default boolean isRunning() {
+        return getSensorMonitor().isRunning();
     }
 
     /**
