@@ -3,10 +3,13 @@ package org.example.MainProject;
 import com.influxdb.client.InfluxDBClient;
 import com.influxdb.client.InfluxDBClientFactory;
 import com.influxdb.client.WriteApiBlocking;
+import com.influxdb.client.domain.WritePrecision;
+import com.influxdb.client.write.Point;
 import org.example.MyLibrary.*;
 import org.iot.raspberry.grovepi.GrovePi;
 import org.iot.raspberry.grovepi.pi4j.GrovePi4J;
 
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
@@ -15,10 +18,10 @@ import java.util.logging.Logger;
 public class CookiesFactorySimulator {
     private static boolean acquisitionON = true;
 
-    public static final String BUCKET = "Grafana";
-    public static final String ORG = "Supsi";
-    private static final String TOKEN = "b21xsGBINmFAwno-66qgvc7EgfSTQbMRoEvjRCW-Z39XNa4mTJLwjeaGNJ1tj5snuPgkhwGkAMgSIDxHjkSb2Q==";
-    private static final InfluxDBClient CLIENT = InfluxDBClientFactory.create("http://169.254.201.100:8086", TOKEN.toCharArray());
+    public static final String BUCKET = "grafana_test";
+    public static final String ORG = "SUPSI";
+    private static final String TOKEN = "xBkf3KGBhgbujwgKbkSof-l1JStrM17j2-fxq1wETteFec0OmAm66sd1g4q-7BmEK8PUphHc6E9ciAGDqwMB1g==";
+    private static final InfluxDBClient CLIENT = InfluxDBClientFactory.create("http://169.254.193.89:8086", TOKEN.toCharArray());
     public static final WriteApiBlocking WRITE_API = CLIENT.getWriteApiBlocking();
 
     private static final List<SupsiMonitor<?>> sensors = new ArrayList<>();
@@ -36,8 +39,8 @@ public class CookiesFactorySimulator {
     }
 
     public static void main(String[] args) throws Exception {
-        Logger.getLogger("GrovePi").setLevel(Level.WARNING);
-        Logger.getLogger("RaspberryPi").setLevel(Level.WARNING);
+        Logger.getLogger("GrovePi").setLevel(Level.OFF);
+        Logger.getLogger("RaspberryPi").setLevel(Level.OFF);
 
         // Raspberry - Gp1
         GrovePi grovePi = new GrovePi4J();
@@ -64,10 +67,12 @@ public class CookiesFactorySimulator {
             // Button Listener calls the method onClick() in Oven class when pressed.
 
             // Toggle LED
-            factory.ledToggle(); //TODO aggiustare il firstAccess
+            factory.ledToggle();
 
             // Calculate speed and send the Point to influxdb
             factory.speedCalculator(speedRanger);
+
+            factory.isOvenWorking();
 
         }
 

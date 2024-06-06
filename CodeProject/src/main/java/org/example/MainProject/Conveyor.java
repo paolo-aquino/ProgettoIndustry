@@ -84,7 +84,8 @@ public class Conveyor {
                     readingValue = false;
 
                     rotations++;
-                    if(endTime - rpmTimeStart >= 60_000){
+                    if(endTime - rpmTimeStart >= 30_000){
+                        rotations *= 2;
                         Point speedPoint = Point.measurement("conveyor_speed").addField("speed", rotations)
                                 .addTag("speed_cat", speed.toString()).time(Instant.now(), WritePrecision.MS);
                         CookiesFactorySimulator.WRITE_API.writePoint(CookiesFactorySimulator.BUCKET, CookiesFactorySimulator.ORG, speedPoint);

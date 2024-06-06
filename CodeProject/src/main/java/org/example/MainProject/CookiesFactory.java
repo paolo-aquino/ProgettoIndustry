@@ -27,6 +27,10 @@ public class CookiesFactory {
         conveyor.ledToggle();
     }
 
+    public boolean isOvenWorking() {
+        return oven.isWorking();
+    }
+
     public void showStats(final SupsiRgbLcd lcd) throws IOException {
         display.showStats(lcd, oven.isButtonWorking(), conveyor.getRpm());
     }
