@@ -12,34 +12,18 @@ public class SupsiButton extends GroveButton implements SupsiMonitor<Boolean> {
     private final SensorMonitor<Boolean> buttonMonitor;
 
 
-    public SupsiButton(GrovePi grovePi, int pin, long readInterval) throws IOException {
+    public SupsiButton(GrovePi grovePi, int pin, long readInterval, GroveButtonListener groveButtonListener) throws IOException {
         super(grovePi, pin);
 
         buttonMonitor = new SensorMonitor<>(this, readInterval);
 
-        setButtonListener(new GroveButtonListener() {
-            @Override
-            public void onRelease() {
-
-            }
-
-            @Override
-            public void onPress() {
-
-            }
-
-            @Override
-            public void onClick() {
-
-            }
-        });
+        setButtonListener(groveButtonListener);
 
         buttonMonitor.start();
-
     }
 
-    public SupsiButton(GrovePi grovePi, int pin) throws IOException{
-        this(grovePi, pin, RESPONSE_TIME);
+    public SupsiButton(GrovePi grovePi, int pin, GroveButtonListener groveButtonListener) throws IOException{
+        this(grovePi, pin, RESPONSE_TIME, groveButtonListener);
     }
 
     @Override
