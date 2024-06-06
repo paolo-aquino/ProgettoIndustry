@@ -55,4 +55,9 @@ public class SupsiSoundSensor extends GroveSoundSensor implements SupsiMonitor<D
     public String toString(){
         return soundMonitor.toString();
     }
+
+    @Override
+    public int getSensorID() {
+        return 0;
+    }
 }

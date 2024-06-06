@@ -51,4 +51,9 @@ public class SupsiUltrasonicRanger extends GroveUltrasonicRanger implements Sups
     public String toString() {
         return rangerMonitor.toString();
     }
+
+    @Override
+    public int getSensorID() {
+        return 0;
+    }
 }

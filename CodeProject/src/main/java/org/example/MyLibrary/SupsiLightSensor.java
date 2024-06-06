@@ -55,4 +55,9 @@ public class SupsiLightSensor extends GroveLightSensor implements SupsiMonitor<D
     public String toString(){
         return lightMonitor.toString();
     }
+
+    @Override
+    public int getSensorID() {
+        return 0;
+    }
 }

@@ -20,7 +20,7 @@ public class UltrasonicRangerTest {
 
         GrovePi grovepi = new GrovePi4J();
 
-        SupsiUltrasonicRanger ranger = new SupsiUltrasonicRanger(grovepi, 7);
+        SupsiUltrasonicRanger ranger = new SupsiUltrasonicRanger(grovepi, 4);
 
         boolean firstRotation = true;
         boolean readingValue = false;
@@ -55,7 +55,8 @@ public class UltrasonicRangerTest {
 
 
                         double time = diff /1000.0;
-                        System.out.println("Velocita tangenziale: " + CIRCUMFERENCE/time);
+                        double vel = CIRCUMFERENCE/time;
+                        System.out.println("Velocita tangenziale: " + (vel * RADIUS));
 
                         startTime = System.currentTimeMillis();
                         System.out.println("New Start: " + startTime);

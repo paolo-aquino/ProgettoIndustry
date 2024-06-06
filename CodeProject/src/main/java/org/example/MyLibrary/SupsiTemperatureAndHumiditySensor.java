@@ -71,4 +71,9 @@ public class SupsiTemperatureAndHumiditySensor extends GroveTemperatureAndHumidi
     public String toString() {
         return gthMonitor.toString();
     }
+
+    @Override
+    public int getSensorID() {
+        return 0;
+    }
 }

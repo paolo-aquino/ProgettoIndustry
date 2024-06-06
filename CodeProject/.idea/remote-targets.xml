@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="RemoteTargetsManager">
-    <option name="projectDefaultTargetUuid" value="9134e1f8-33e4-4a88-a1d9-9a25e29dfcc7" />
+    <option name="projectDefaultTargetUuid" value="138576e0-ea7a-453b-9725-82e7650ef6a6" />
     <targets>
       <target name="pi@raspberrypi-gp1:22" type="ssh/sftp" uuid="138576e0-ea7a-453b-9725-82e7650ef6a6">
         <config>
-          <option name="projectRootOnTarget" value="/home/pi/CodeProject" />
-          <option name="serverName" value="pi@raspberrypi-gp1:22 password" />
+          <option name="projectRootOnTarget" value="$PROJECT_DIR$/../../../../../../../pi/CodeProject" />
+          <option name="serverName" value="pi@169.254.149.120:22 password" />
         </config>
         <ContributedStateBase type="JavaLanguageRuntime">
           <config>

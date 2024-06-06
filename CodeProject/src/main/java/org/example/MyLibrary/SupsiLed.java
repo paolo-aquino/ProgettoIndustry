@@ -6,59 +6,50 @@ import org.iot.raspberry.grovepi.sensors.synch.SensorMonitor;
 import org.iot.raspberry.grovepi.sensors.synch.SensorValueSupplier;
 
 import java.io.IOException;
+import java.util.Objects;
 
-public class SupsiLed extends GroveLed implements SensorValueSupplier<Void>, SupsiMonitor<Void>{
-    private final LedMonitor ledMonitor;
-    private boolean blink;
-    private boolean firstAccess;
+public class SupsiLed extends GroveLed {
+    private final static TypePort PORT = TypePort.DIGITAL;
+
+    private final int sensorID;
+
+    private boolean isOn;
+    private long startTime;
 
     public SupsiLed(GrovePi grovePi, int pin, long readInterval) throws IOException {
         super(grovePi, pin);
-        ledMonitor = new LedMonitor(this, readInterval);
-        blink = false;
-        firstAccess = true;
+        sensorID = pin;
+        isOn = false;
     }
 
     public SupsiLed(GrovePi grovePi, int pin) throws IOException {
         this(grovePi, pin, 500);
     }
 
-    public void On() throws IOException {
+    public void on() throws IOException {
         set(255);
     }
 
-    public void Off() throws IOException {
+    public void off() throws IOException {
         set(0);
     }
 
-    public void startToggle() throws IOException {
-        ledMonitor.start();
-    }
+    public void blink() throws IOException {
+        long time = System.currentTimeMillis() - startTime;
 
-    public void stopToggle() throws IOException {
-        if (firstAccess) {
-            firstAccess = false;
-            return;
+        if(time > 1000 && isOn) {
+            off();
+            isOn = false;
+        } else if (time > 1000) {
+            on();
+            isOn = true;
         }
 
-        ledMonitor.stop();
+        startTime = System.currentTimeMillis();
     }
 
-    public boolean getBlink() {
-        return blink;
+    public boolean getOn() {
+        return isOn;
     }
 
-    public void setBlink() {
-        blink = !blink;
-    }
-
-    @Override
-    public SensorMonitor getSensorMonitor() {
-        return null;
-    }
-
-    @Override
-    public Void get() throws Exception {
-        return null;
-    }
 }

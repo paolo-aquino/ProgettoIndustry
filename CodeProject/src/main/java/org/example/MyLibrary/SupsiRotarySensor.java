@@ -80,4 +80,9 @@ public class SupsiRotarySensor extends GroveRotarySensor implements SupsiMonitor
     public String toString() {
         return rotarySensorMonitor.toString();
     }
+
+    @Override
+    public int getSensorID() {
+        return 0;
+    }
 }

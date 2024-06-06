@@ -6,12 +6,16 @@ import org.iot.raspberry.grovepi.sensors.synch.SensorMonitor;
  * An interface for monitoring sensor values asynchronously.
  * @param <R> The type of sensor value
  */
-public interface SupsiMonitor<R> {
+public interface SupsiMonitor<R> extends SupsiSensor {
     /**
      * Retrieves the underlying SensorMonitor instance.
      * @return The SensorMonitor instance.
      */
     SensorMonitor<R> getSensorMonitor();
+
+    default boolean start() {
+        return getSensorMonitor().start();
+    }
 
     /**
      * Checks if the current value is valid.

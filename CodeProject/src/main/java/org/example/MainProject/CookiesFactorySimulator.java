@@ -7,7 +7,6 @@ import org.example.MyLibrary.*;
 import org.iot.raspberry.grovepi.GrovePi;
 import org.iot.raspberry.grovepi.pi4j.GrovePi4J;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
@@ -24,7 +23,7 @@ public class CookiesFactorySimulator {
 
     private static final List<SupsiMonitor<?>> sensors = new ArrayList<>();
 
-    private static void addSensorMonitored(SupsiMonitor<?> sensorMonitor){
+    private static void addSensorMonitored(SupsiMonitor<?> sensorMonitor) {
         sensors.add(sensorMonitor);
     }
 
@@ -48,25 +47,27 @@ public class CookiesFactorySimulator {
         SupsiRgbLcd lcd = new SupsiRgbLcd();
 
         // Leds - Red and Blue - D1 and D2 ports
-        SupsiLed redLight = new SupsiLed(grovePi, 1);
-        SupsiLed blueLight = new SupsiLed(grovePi, 2);
+        SupsiLed redLight = new SupsiLed(grovePi, 2);
+        SupsiLed blueLight = new SupsiLed(grovePi, 3);
 
         // Factory Object
         CookiesFactory factory = new CookiesFactory(redLight, blueLight);
 
         // Ultrasonic ranger - D7 port
-        SupsiUltrasonicRanger speedRanger = new SupsiUltrasonicRanger(grovePi, 7);
+        SupsiUltrasonicRanger speedRanger = new SupsiUltrasonicRanger(grovePi, 4);
 
-        // Button - D3 port
-        SupsiButton button = new SupsiButton(grovePi, 3, factory.getGroveButtonListener());
+        // Button - D3 port - Seems like its never used, but trust me it is used!
+        SupsiButton button = new SupsiButton(grovePi, 5, factory.getGroveButtonListener());
 
         while(true){
 
-            // Calculate speed and send the Point to influxdb
-            factory.speedCalculator(speedRanger);
+            // Button Listener calls the method onClick() in Oven class when pressed.
 
             // Toggle LED
-            factory.ledToggle();
+            factory.ledToggle(); //TODO aggiustare il firstAccess
+
+            // Calculate speed and send the Point to influxdb
+            factory.speedCalculator(speedRanger);
 
         }
 

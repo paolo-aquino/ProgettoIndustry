@@ -30,7 +30,7 @@ public class Conveyor {
     private static final int DEFAULT_DISTANCE = 10;
     private static final double RADIUS = 0.04;
     private static final double CIRCUMFERENCE = 2 * Math.PI * RADIUS;
-    private static final double DEFAULT_SPEED = 0.5;
+    private static final double DEFAULT_SPEED = 0.01;
     private boolean firstRotation;
     private boolean readingValue;
     private long startTime;
@@ -77,7 +77,8 @@ public class Conveyor {
                     long diff = endTime - startTime;
 
                     double time = diff /1000.0;
-                    speed = (CIRCUMFERENCE/time) > DEFAULT_SPEED ? Speed.SLOW : Speed.FAST;
+
+                    speed = (CIRCUMFERENCE/time * RADIUS) > DEFAULT_SPEED ? Speed.FAST : Speed.SLOW;
 
                     startTime = System.currentTimeMillis();
                     readingValue = false;
@@ -100,12 +101,12 @@ public class Conveyor {
     public void ledToggle() throws IOException {
         switch (speed) {
             case SLOW:
-                blueLight.stopToggle();
-                redLight.startToggle();
+                blueLight.off();
+                redLight.blink();
                 break;
             case FAST:
-                redLight.stopToggle();
-                blueLight.startToggle();
+                redLight.off();
+                blueLight.blink();
                 break;
         }
     }
