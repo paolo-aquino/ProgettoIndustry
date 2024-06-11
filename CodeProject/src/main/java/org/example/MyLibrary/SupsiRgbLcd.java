@@ -11,7 +11,7 @@ import java.io.IOException;
  *
  * @author Paolo Aquino
  */
-public class SupsiRgbLcd extends GroveRgbLcdPi4J {
+public final class SupsiRgbLcd extends GroveRgbLcdPi4J {
     private static final int CLEAR_DISPLAY = 0x01;
     private static final int FIRST_ROW = 0x80;
     private static final int SECOND_ROW = (0x80 | 0x40);

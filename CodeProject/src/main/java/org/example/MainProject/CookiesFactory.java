@@ -8,7 +8,7 @@ import org.iot.raspberry.grovepi.sensors.listener.GroveButtonListener;
 
 import java.io.IOException;
 
-public class CookiesFactory {
+public final class CookiesFactory {
 
     private final Display display;
     private final Conveyor conveyor;
@@ -35,7 +35,7 @@ public class CookiesFactory {
     }
 
     public String getConveyorSpeed() {
-        return conveyor.getSpeed().toString();
+        return conveyor.getSpeed();
     }
 
     public void ledBlink() throws IOException {
@@ -58,7 +58,7 @@ public class CookiesFactory {
         display.showStats(oven.isButtonWorking(), conveyor.getRpm(), conveyor.getCookiesCounter());
     }
 
-    public void showMessage(String text, Object... args) throws IOException {
+    public void showMessage(final String text, final Object... args) throws IOException {
         display.showMessage(text, args);
     }
 

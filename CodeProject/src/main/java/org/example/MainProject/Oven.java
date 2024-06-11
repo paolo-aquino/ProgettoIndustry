@@ -2,7 +2,7 @@ package org.example.MainProject;
 
 import org.iot.raspberry.grovepi.sensors.listener.GroveButtonListener;
 
-public class Oven {
+public final class Oven {
 
     private final GroveButtonListener groveButtonListener;
     private boolean isButtonWorking;

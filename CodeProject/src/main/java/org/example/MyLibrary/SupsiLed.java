@@ -5,23 +5,20 @@ import org.iot.raspberry.grovepi.sensors.digital.GroveLed;
 
 import java.io.IOException;
 
-public class SupsiLed extends GroveLed {
-    private final static TypePort PORT = TypePort.DIGITAL;
-
-    private final int sensorID;
+public final class SupsiLed extends GroveLed {
+    private final static long RESPONSE_TIME = 500;
 
     private boolean isOn;
     private long startTime;
 
-    public SupsiLed(GrovePi grovePi, int pin, long readInterval) throws IOException {
+    public SupsiLed(final GrovePi grovePi, final int pin, final long readInterval) throws IOException {
         super(grovePi, pin);
-        sensorID = pin;
         isOn = false;
         startTime = System.currentTimeMillis();
     }
 
-    public SupsiLed(GrovePi grovePi, int pin) throws IOException {
-        this(grovePi, pin, 500);
+    public SupsiLed(final GrovePi grovePi, final int pin) throws IOException {
+        this(grovePi, pin, RESPONSE_TIME);
     }
 
     public void on() throws IOException {

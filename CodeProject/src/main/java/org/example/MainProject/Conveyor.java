@@ -8,10 +8,23 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+/**
+ * Class representing the Conveyor of the Factory.
+ *
+ * @author Paolo Aquino
+ * @author Zeno Darani
+ * @author Matteo Cazzani
+ */
+public final class Conveyor {
 
-public class Conveyor {
-
-    public enum Speed {
+    /**
+     * Enum representing the speed of the Conveyor.
+     *
+     * @author Paolo Aquino
+     * @author Zeno Darani
+     * @author Matteo Cazzani
+     */
+    private enum Speed {
         FAST("high_speed"),
         SLOW("low_speed");
 
@@ -41,7 +54,7 @@ public class Conveyor {
     private long endTime = 0;
     private long initIntervalTime = 0;
     private boolean isInLoop;
-    private List<Double> rpmList = new ArrayList<>();
+    private final List<Double> rpmList = new ArrayList<>();
 
     private final SupsiLed redLight;
     private final SupsiLed blueLight;
@@ -108,10 +121,6 @@ public class Conveyor {
     }
 
     public boolean isCookieCrossing() {
-        if(counterRanger.isValid())
-            System.out.println("BISCOTTIIIIII:: " + counterRanger.getValue());
-
-
         if(counterRanger.isValid() && counterRanger.getValue() <= COOKIE_DEFAULT_DISTANCE) {
             isReading = true;
         } else if (isReading) {
@@ -150,8 +159,8 @@ public class Conveyor {
         return rpm;
     }
 
-    public Speed getSpeed() {
-        return speed;
+    public String getSpeed() {
+        return speed.toString();
     }
 
     public int getCookiesCounter() {
