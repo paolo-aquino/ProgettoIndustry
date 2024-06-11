@@ -60,6 +60,7 @@ public final class Conveyor {
     private Speed speed;
     private boolean speedSignal;
     private long startTime;
+    private long initIntervalTime;
     private boolean isInLoop;
     private final List<Double> rpmList;
 
@@ -80,6 +81,7 @@ public final class Conveyor {
         speed = Speed.SLOW;
         speedSignal = false;
         startTime = 0;
+        initIntervalTime = 0;
         isInLoop = true;
         rpmList = new ArrayList<>();
 
@@ -98,7 +100,6 @@ public final class Conveyor {
         if(speedRanger.isValid()) {
             final double value = speedRanger.getValue();
 
-            long initIntervalTime = 0;
             if(firstRotation) {
                 initIntervalTime = System.currentTimeMillis();
                 firstRotation = false;
