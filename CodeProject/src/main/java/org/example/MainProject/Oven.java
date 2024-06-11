@@ -3,58 +3,31 @@ package org.example.MainProject;
 import org.iot.raspberry.grovepi.sensors.listener.GroveButtonListener;
 
 public class Oven {
-    private final static long LONG_PERIOD = 20_000;
-    private final static long SHORT_PERIOD = 3_000;
 
     private final GroveButtonListener groveButtonListener;
     private boolean isButtonWorking;
-    private int buttonCounter;
-    private long clickTime;
-    private boolean firstClick = true;
-    private boolean buttonSignal = false;
-
+    private long pressTime;
     private boolean isButtonPressed;
 
     public Oven() {
-        isButtonWorking = true;
-        buttonCounter = 0;
+        isButtonWorking = false;
         isButtonPressed = false;
 
-        clickTime = System.currentTimeMillis();
         groveButtonListener = new GroveButtonListener() {
             @Override
             public void onRelease() {
-
+                long time = System.currentTimeMillis() - pressTime;
+                isButtonWorking = time < 1_000;
             }
 
             @Override
             public void onPress() {
-
+                pressTime = System.currentTimeMillis();
             }
 
             @Override
             public void onClick() {
-
-                buttonCounter++;
                 isButtonPressed = true;
-
-                if(firstClick) {
-                    clickTime = System.currentTimeMillis();
-                } else {
-                    if(System.currentTimeMillis() - clickTime <= SHORT_PERIOD && !buttonSignal) {
-                        clickTime = System.currentTimeMillis();
-                        buttonSignal = true;
-                        isButtonWorking = true;
-                    }
-
-                    if(System.currentTimeMillis() - clickTime > LONG_PERIOD && buttonSignal) {
-                        clickTime = System.currentTimeMillis();
-                        buttonSignal = false;
-                    }
-
-                    isButtonWorking = false;
-                }
-
             }
         };
     }

@@ -30,7 +30,7 @@ public class SupsiUltrasonicRanger extends GroveUltrasonicRanger implements Sups
      * @param pin The pin number to which the sensor is connected.
      */
     public SupsiUltrasonicRanger(GrovePi grovePi, int pin) {
-        this(grovePi, pin, 100);
+        this(grovePi, pin, 10);
     }
 
     /**

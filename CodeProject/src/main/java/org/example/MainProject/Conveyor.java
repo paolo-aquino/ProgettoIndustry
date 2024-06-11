@@ -4,6 +4,9 @@ import org.example.MyLibrary.SupsiLed;
 import org.example.MyLibrary.SupsiUltrasonicRanger;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 
 public class Conveyor {
@@ -30,10 +33,10 @@ public class Conveyor {
     private static final double DEFAULT_SPEED = 0.01;
     private boolean firstRotation;
     private boolean readingValue;
-    private long startTime;
+    //private long startTime;
     private long rpmTimeStart;
     private int rotations;
-    private int rpm;
+    private double rpm;
     private Speed speed;
 
     private final SupsiLed redLight;
@@ -43,6 +46,12 @@ public class Conveyor {
     private boolean speedSignal;
 
     private final SupsiUltrasonicRanger counterRanger;
+
+    long startTime = 0;
+    long endTime = 0;
+    long initIntervalTime = 0;
+    boolean isInLoop;
+    List<Double> rpmList = new ArrayList<Double>();
 
     public Conveyor(final SupsiLed redLight, final SupsiLed blueLight, final SupsiUltrasonicRanger speedRanger, SupsiUltrasonicRanger counterRanger) {
         this.redLight = redLight;
@@ -58,49 +67,47 @@ public class Conveyor {
         rotations = 0;
         rpm = 0;
         speed = Speed.SLOW;
+
+        isInLoop = true;
     }
 
     public void speedCalculator() {
-        if(firstRotation) {
-            if (speedRanger.isValid() && speedRanger.getValue() <= DEFAULT_DISTANCE) {
-                readingValue = true;
-            } else if (readingValue) {
-                if(speedRanger.isValid() && speedRanger.getValue() > DEFAULT_DISTANCE) {
-                    startTime = System.currentTimeMillis();
-                    firstRotation = false;
-                    readingValue = false;
+        if (speedRanger.isValid()){
+            double value = speedRanger.getValue();
 
-                    rpmTimeStart = startTime;
-                }
+            if (firstRotation){
+                initIntervalTime = System.currentTimeMillis();
+                firstRotation = false;
             }
-        } else {
-            if(speedRanger.isValid() && speedRanger.getValue() <= DEFAULT_DISTANCE) {
-                readingValue = true;
-            } else if (readingValue) {
-                if(speedRanger.isValid() && speedRanger.getValue() > DEFAULT_DISTANCE) {
-                    long endTime = System.currentTimeMillis();
-                    long diff = endTime - startTime;
 
-                    double time = diff /1000.0;
+            if (value <= DEFAULT_DISTANCE){
 
-                    speed = (CIRCUMFERENCE/time * RADIUS) > DEFAULT_SPEED ? Speed.FAST : Speed.SLOW;
+                if (isInLoop){
+                    endTime = System.currentTimeMillis();
+                    if (startTime != 0){
+                        double calcRpm = 2 * 3.14 / ((endTime - startTime)/1000.0) * 9.549;
+                        rpmList.add(calcRpm);
 
-                    System.out.println();
-                    System.out.println("SPEEEED:::" + speed);
-                    System.out.println();
-
-                    startTime = System.currentTimeMillis();
-                    readingValue = false;
-
-                    rotations++;
-                    if(endTime - rpmTimeStart >= 30_000){
-                        rpm = rotations * 2;
-                        rotations = 0;
-                        rpmTimeStart = System.currentTimeMillis();
-                        speedSignal = true;
                     }
+                    startTime = System.currentTimeMillis();
+                    isInLoop = false;
+                }
+
+            }else{
+                if (!isInLoop){
+                    isInLoop = true;
                 }
             }
+
+            if (System.currentTimeMillis() - initIntervalTime >= 5_000){
+                if (rpmList.size() != 0) {
+                    rpm = Collections.max(rpmList);
+                    speedSignal = true;
+                    firstRotation = true;
+                    rpmList.clear();
+                }
+            }
+
         }
     }
 
@@ -125,7 +132,7 @@ public class Conveyor {
         }
     }
 
-    public int getRpm() {
+    public double getRpm() {
         return rpm;
     }
 

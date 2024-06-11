@@ -39,7 +39,7 @@ public class SupsiLed extends GroveLed {
     public void blink() throws IOException {
         long time = System.currentTimeMillis() - startTime;
 
-        if(time >= 1000) {
+        if(time >= 1_500) {
             if(isOn) {
                 off();
             } else {

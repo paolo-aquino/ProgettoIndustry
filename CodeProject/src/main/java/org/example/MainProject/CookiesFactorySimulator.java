@@ -26,6 +26,8 @@ public class CookiesFactorySimulator {
     public static void main(String[] args) throws Exception {
         Logger.getLogger("GrovePi").setLevel(Level.OFF);
         Logger.getLogger("RaspberryPi").setLevel(Level.OFF);
+        Logger.getLogger("Pi4J IO write").setLevel(Level.OFF);
+        Logger.getLogger("Pi4J IO read").setLevel(Level.OFF);
 
         // Raspberry - Gp1
         GrovePi grovePi = new GrovePi4J();
@@ -35,16 +37,16 @@ public class CookiesFactorySimulator {
 
         // Leds - Red and Blue - D2 and D3 ports
         SupsiLed redLight = new SupsiLed(grovePi, 2);
-        SupsiLed blueLight = new SupsiLed(grovePi, 3);
+        SupsiLed blueLight = new SupsiLed(grovePi, 4);
 
         // Ultrasonic ranger - D4 port
-        SupsiUltrasonicRanger speedRanger = new SupsiUltrasonicRanger(grovePi, 4);
+        SupsiUltrasonicRanger speedRanger = new SupsiUltrasonicRanger(grovePi, 6);
 
         // Ultrasonic ranger - D5 port
-        SupsiUltrasonicRanger counterRanger = new SupsiUltrasonicRanger(grovePi, 5);
+        SupsiUltrasonicRanger counterRanger = new SupsiUltrasonicRanger(grovePi, 7);
 
         // Button - D6 port
-        SupsiButton button = new SupsiButton(grovePi, 6);
+        SupsiButton button = new SupsiButton(grovePi, 3);
 
         // Factory Object
         CookiesFactory factory = new CookiesFactory(lcd, redLight, blueLight, speedRanger, counterRanger, button);
@@ -52,6 +54,7 @@ public class CookiesFactorySimulator {
         factory.showMessage("Welcome To our Cookies Factory!");
 
         while(true) {
+
             // Calculates the speed
             factory.speedCalculator();
             if(factory.isSpeedSignalReady()) {

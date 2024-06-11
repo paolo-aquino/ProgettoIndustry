@@ -30,7 +30,7 @@ public class CookiesFactory {
         return conveyor.isSignalReady();
     }
 
-    public int getConveyorRPM() {
+    public double getConveyorRPM() {
         return conveyor.getRpm();
     }
 
