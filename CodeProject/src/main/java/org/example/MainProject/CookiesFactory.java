@@ -1,5 +1,6 @@
 package org.example.MainProject;
 
+import org.example.MyLibrary.SupsiButton;
 import org.example.MyLibrary.SupsiLed;
 import org.example.MyLibrary.SupsiRgbLcd;
 import org.example.MyLibrary.SupsiUltrasonicRanger;
@@ -9,30 +10,48 @@ import java.io.IOException;
 
 public class CookiesFactory {
 
-    private final Oven oven;
-    private final Conveyor conveyor;
     private final Display display;
+    private final Conveyor conveyor;
+    private final Oven oven;
 
-    public CookiesFactory(final SupsiLed redligth, final SupsiLed blueLight) {
+    public CookiesFactory(final SupsiRgbLcd lcd, final SupsiLed redligth, final SupsiLed blueLight, final SupsiUltrasonicRanger speedRanger, final SupsiUltrasonicRanger counterRanger, final SupsiButton button) {
+        display = new Display(lcd);
+        conveyor = new Conveyor(redligth, blueLight, speedRanger, counterRanger);
+
         oven = new Oven();
-        conveyor = new Conveyor(redligth, blueLight);
-        display = new Display();
+        button.setButtonListener(getGroveButtonListener());
     }
 
-    public void speedCalculator(final SupsiUltrasonicRanger ranger) throws IOException {
-        conveyor.speedCalculator(ranger);
+    public void speedCalculator() throws IOException {
+        conveyor.speedCalculator();
     }
 
-    public void ledToggle() throws IOException {
-        conveyor.ledToggle();
+    public boolean isSpeedSignalReady() {
+        return conveyor.isSignalReady();
+    }
+
+    public int getConveyorRPM() {
+        return conveyor.getRpm();
+    }
+
+    public String getConveyorSpeed() {
+        return conveyor.getSpeed().toString();
+    }
+
+    public void ledBlink() throws IOException {
+        conveyor.ledBlink();
     }
 
     public boolean isOvenWorking() {
-        return oven.isWorking();
+        return oven.isButtonWorking();
     }
 
-    public void showStats(final SupsiRgbLcd lcd) throws IOException {
-        display.showStats(lcd, oven.isButtonWorking(), conveyor.getRpm());
+    public boolean isOvenSignalReady() {
+        return oven.isButtonPressed();
+    }
+
+    public void showStats() throws IOException {
+        display.showStats(oven.isButtonWorking(), conveyor.getRpm());
     }
 
     public GroveButtonListener getGroveButtonListener() {

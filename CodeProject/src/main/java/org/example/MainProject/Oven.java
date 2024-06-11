@@ -1,21 +1,26 @@
 package org.example.MainProject;
 
-import com.influxdb.client.WriteApiBlocking;
-import com.influxdb.client.domain.WritePrecision;
-import com.influxdb.client.write.Point;
 import org.iot.raspberry.grovepi.sensors.listener.GroveButtonListener;
 
-import java.sql.SQLOutput;
-import java.time.Instant;
-
 public class Oven {
+    private final static long LONG_PERIOD = 20_000;
+    private final static long SHORT_PERIOD = 3_000;
+
     private final GroveButtonListener groveButtonListener;
     private boolean isButtonWorking;
     private int buttonCounter;
     private long clickTime;
-    private int clicks;
+    private boolean firstClick = true;
+    private boolean buttonSignal = false;
+
+    private boolean isButtonPressed;
 
     public Oven() {
+        isButtonWorking = true;
+        buttonCounter = 0;
+        isButtonPressed = false;
+
+        clickTime = System.currentTimeMillis();
         groveButtonListener = new GroveButtonListener() {
             @Override
             public void onRelease() {
@@ -31,77 +36,43 @@ public class Oven {
             public void onClick() {
 
                 buttonCounter++;
+                isButtonPressed = true;
 
-                clickTime = System.currentTimeMillis();
-
-                /*
-                if(clickTime < 5_000) {
-                    if (buttonCounter > 2) {
-                        Point button = Point.measurement("oven_door").addField("is_okay", false).time(Instant.now(), WritePrecision.MS);
-                        CookiesFactorySimulator.WRITE_API.writePoint(CookiesFactorySimulator.BUCKET, CookiesFactorySimulator.ORG, button);
-                        buttonCounter = 0;
-                    }
-                }
-
-
-
-
-                if(clickTime < 10_000) {
-                    isButtonWorking = true;
-                    buttonCounter = 0;
-                    clickTime = 0;
-                } else {
+                if(firstClick) {
                     clickTime = System.currentTimeMillis();
+                } else {
+                    if(System.currentTimeMillis() - clickTime <= SHORT_PERIOD && !buttonSignal) {
+                        clickTime = System.currentTimeMillis();
+                        buttonSignal = true;
+                        isButtonWorking = true;
+                    }
 
-                    Point button = Point.measurement("oven_door").addField("is_okay", isButtonWorking).time(Instant.now(), WritePrecision.MS);
-                    CookiesFactorySimulator.WRITE_API.writePoint(CookiesFactorySimulator.BUCKET, CookiesFactorySimulator.ORG, button);
+                    if(System.currentTimeMillis() - clickTime > LONG_PERIOD && buttonSignal) {
+                        clickTime = System.currentTimeMillis();
+                        buttonSignal = false;
+                    }
 
-                    System.out.println();
-                    System.out.println("TEOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO");
-                    System.out.println();
+                    isButtonWorking = false;
                 }
-                 */
 
             }
         };
-
-        isButtonWorking = true;
-        buttonCounter = 0;
-        clickTime = 0;
     }
 
     public GroveButtonListener getGroveButtonListener() {
         return groveButtonListener;
     }
 
-    public boolean isWorking() {
-        long time = System.currentTimeMillis() - clickTime;
-
-        System.out.println("TIMEEEEEEEEEEEEEEE: " + time);
-        System.out.println("BUTTONCOUNTERRRR" + buttonCounter);
-
-        if(time < 15_000) {
-            if (time > 3000) {
-                if (buttonCounter == 1) {
-                    Point button = Point.measurement("oven_door").addField("is_okay", false).time(Instant.now(), WritePrecision.MS);
-                    CookiesFactorySimulator.WRITE_API.writePoint(CookiesFactorySimulator.BUCKET, CookiesFactorySimulator.ORG, button);
-                    buttonCounter = 0;
-                }
-            }
-
-            if (buttonCounter == 2) {
-                Point button = Point.measurement("oven_door").addField("is_okay", true).time(Instant.now(), WritePrecision.MS);
-                CookiesFactorySimulator.WRITE_API.writePoint(CookiesFactorySimulator.BUCKET, CookiesFactorySimulator.ORG, button);
-                buttonCounter = 0;
-            }
-
-        }
-
-        return true;
-    }
-
     public boolean isButtonWorking() {
         return isButtonWorking;
     }
 
+    public boolean isButtonPressed() {
+        if(isButtonPressed) {
+            isButtonPressed = false;
+            return true;
+        }
+
+        return false;
+    }
 }

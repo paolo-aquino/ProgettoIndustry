@@ -10,8 +10,6 @@ import org.iot.raspberry.grovepi.GrovePi;
 import org.iot.raspberry.grovepi.pi4j.GrovePi4J;
 
 import java.time.Instant;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -24,19 +22,6 @@ public class CookiesFactorySimulator {
     private static final InfluxDBClient CLIENT = InfluxDBClientFactory.create("http://169.254.193.89:8086", TOKEN.toCharArray());
     public static final WriteApiBlocking WRITE_API = CLIENT.getWriteApiBlocking();
 
-    private static final List<SupsiMonitor<?>> sensors = new ArrayList<>();
-
-    private static void addSensorMonitored(SupsiMonitor<?> sensorMonitor) {
-        sensors.add(sensorMonitor);
-    }
-
-    /**
-     * All sensors in list will stop monitoring
-     */
-    private static void stopAll() {
-        for (SupsiMonitor<?> sensor : sensors)
-            sensor.stop();
-    }
 
     public static void main(String[] args) throws Exception {
         Logger.getLogger("GrovePi").setLevel(Level.OFF);
@@ -46,33 +31,40 @@ public class CookiesFactorySimulator {
         GrovePi grovePi = new GrovePi4J();
 
         // LCD display - I2C port
-        @SuppressWarnings("resource")
         SupsiRgbLcd lcd = new SupsiRgbLcd();
 
-        // Leds - Red and Blue - D1 and D2 ports
+        // Leds - Red and Blue - D2 and D3 ports
         SupsiLed redLight = new SupsiLed(grovePi, 2);
         SupsiLed blueLight = new SupsiLed(grovePi, 3);
 
-        // Factory Object
-        CookiesFactory factory = new CookiesFactory(redLight, blueLight);
-
-        // Ultrasonic ranger - D7 port
+        // Ultrasonic ranger - D4 port
         SupsiUltrasonicRanger speedRanger = new SupsiUltrasonicRanger(grovePi, 4);
 
-        // Button - D3 port - Seems like its never used, but trust me it is used!
-        SupsiButton button = new SupsiButton(grovePi, 5, factory.getGroveButtonListener());
+        // Ultrasonic ranger - D5 port
+        SupsiUltrasonicRanger counterRanger = new SupsiUltrasonicRanger(grovePi, 5);
 
-        while(true){
+        // Button - D6 port
+        SupsiButton button = new SupsiButton(grovePi, 6);
 
-            // Button Listener calls the method onClick() in Oven class when pressed.
+        // Factory Object
+        CookiesFactory factory = new CookiesFactory(lcd, redLight, blueLight, speedRanger, counterRanger, button);
 
-            // Toggle LED
-            factory.ledToggle();
+        while(true) {
+            // BlinkLED
+            factory.ledBlink();
 
-            // Calculate speed and send the Point to influxdb
-            factory.speedCalculator(speedRanger);
+            // Calculates the speed
+            factory.speedCalculator();
+            if(factory.isSpeedSignalReady()) {
+                Point speedPoint = Point.measurement("conveyor_speed").addField("speed", factory.getConveyorRPM())
+                        .addTag("speed_cat", factory.getConveyorSpeed()).time(Instant.now(), WritePrecision.MS);
+                WRITE_API.writePoint(BUCKET, ORG, speedPoint);
+            }
 
-            factory.isOvenWorking();
+            if(factory.isOvenSignalReady()) {
+                Point oven = Point.measurement("oven_door").addField("is_okay", factory.isOvenWorking()).time(Instant.now(), WritePrecision.MS);
+                WRITE_API.writePoint(BUCKET, ORG, oven);
+            }
 
         }
 

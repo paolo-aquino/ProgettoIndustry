@@ -2,11 +2,8 @@ package org.example.MyLibrary;
 
 import org.iot.raspberry.grovepi.GrovePi;
 import org.iot.raspberry.grovepi.sensors.digital.GroveLed;
-import org.iot.raspberry.grovepi.sensors.synch.SensorMonitor;
-import org.iot.raspberry.grovepi.sensors.synch.SensorValueSupplier;
 
 import java.io.IOException;
-import java.util.Objects;
 
 public class SupsiLed extends GroveLed {
     private final static TypePort PORT = TypePort.DIGITAL;
@@ -20,6 +17,7 @@ public class SupsiLed extends GroveLed {
         super(grovePi, pin);
         sensorID = pin;
         isOn = false;
+        startTime = System.currentTimeMillis();
     }
 
     public SupsiLed(GrovePi grovePi, int pin) throws IOException {
@@ -28,28 +26,26 @@ public class SupsiLed extends GroveLed {
 
     public void on() throws IOException {
         set(255);
+        isOn = true;
     }
 
     public void off() throws IOException {
-        set(0);
+        if(isOn) {
+            set(0);
+            isOn = false;
+        }
     }
 
     public void blink() throws IOException {
         long time = System.currentTimeMillis() - startTime;
 
-        if(time > 1000 && isOn) {
-            off();
-            isOn = false;
-        } else if (time > 1000) {
-            on();
-            isOn = true;
+        if(time >= 1000) {
+            if(isOn) {
+                off();
+            } else {
+                on();
+            }
+            startTime = System.currentTimeMillis();
         }
-
-        startTime = System.currentTimeMillis();
     }
-
-    public boolean getOn() {
-        return isOn;
-    }
-
 }

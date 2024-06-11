@@ -1,17 +1,14 @@
 package org.example.MainProject;
 
-import com.influxdb.client.WriteApiBlocking;
-import com.influxdb.client.domain.WritePrecision;
-import com.influxdb.client.write.Point;
 import org.example.MyLibrary.SupsiLed;
 import org.example.MyLibrary.SupsiUltrasonicRanger;
 
 import java.io.IOException;
-import java.time.Instant;
+
 
 public class Conveyor {
 
-    private enum Speed {
+    public enum Speed {
         FAST("high_speed"),
         SLOW("low_speed");
 
@@ -42,7 +39,18 @@ public class Conveyor {
     private final SupsiLed redLight;
     private final SupsiLed blueLight;
 
-    public Conveyor(final SupsiLed redLight, final SupsiLed blueLight) {
+    private final SupsiUltrasonicRanger speedRanger;
+    private boolean speedSignal;
+
+    private final SupsiUltrasonicRanger counterRanger;
+
+    public Conveyor(final SupsiLed redLight, final SupsiLed blueLight, final SupsiUltrasonicRanger speedRanger, SupsiUltrasonicRanger counterRanger) {
+        this.redLight = redLight;
+        this.blueLight = blueLight;
+        this.speedRanger = speedRanger;
+        this.counterRanger = counterRanger;
+        speedSignal = false;
+
         firstRotation = true;
         readingValue = false;
         startTime = 0;
@@ -50,17 +58,14 @@ public class Conveyor {
         rotations = 0;
         rpm = 0;
         speed = Speed.SLOW;
-
-        this.redLight = redLight;
-        this.blueLight = blueLight;
     }
 
-    public void speedCalculator(final SupsiUltrasonicRanger ranger) {
+    public void speedCalculator() {
         if(firstRotation) {
-            if (ranger.isValid() && ranger.getValue() <= DEFAULT_DISTANCE) {
+            if (speedRanger.isValid() && speedRanger.getValue() <= DEFAULT_DISTANCE) {
                 readingValue = true;
             } else if (readingValue) {
-                if(ranger.isValid() && ranger.getValue() > DEFAULT_DISTANCE) {
+                if(speedRanger.isValid() && speedRanger.getValue() > DEFAULT_DISTANCE) {
                     startTime = System.currentTimeMillis();
                     firstRotation = false;
                     readingValue = false;
@@ -69,10 +74,10 @@ public class Conveyor {
                 }
             }
         } else {
-            if(ranger.isValid() && ranger.getValue() <= DEFAULT_DISTANCE) {
+            if(speedRanger.isValid() && speedRanger.getValue() <= DEFAULT_DISTANCE) {
                 readingValue = true;
             } else if (readingValue) {
-                if(ranger.isValid() && ranger.getValue() > DEFAULT_DISTANCE) {
+                if(speedRanger.isValid() && speedRanger.getValue() > DEFAULT_DISTANCE) {
                     long endTime = System.currentTimeMillis();
                     long diff = endTime - startTime;
 
@@ -85,21 +90,25 @@ public class Conveyor {
 
                     rotations++;
                     if(endTime - rpmTimeStart >= 30_000){
-                        rotations *= 2;
-                        Point speedPoint = Point.measurement("conveyor_speed").addField("speed", rotations)
-                                .addTag("speed_cat", speed.toString()).time(Instant.now(), WritePrecision.MS);
-                        CookiesFactorySimulator.WRITE_API.writePoint(CookiesFactorySimulator.BUCKET, CookiesFactorySimulator.ORG, speedPoint);
-
-                        rpm = rotations;
+                        rpm = rotations * 2;
                         rotations = 0;
                         rpmTimeStart = System.currentTimeMillis();
+                        speedSignal = true;
                     }
                 }
             }
         }
     }
 
-    public void ledToggle() throws IOException {
+    public boolean isSignalReady() {
+        if(speedSignal) {
+            speedSignal = false;
+            return true;
+        }
+        return false;
+    }
+
+    public void ledBlink() throws IOException {
         switch (speed) {
             case SLOW:
                 blueLight.off();
@@ -112,52 +121,12 @@ public class Conveyor {
         }
     }
 
-    public boolean isFirstRotation() {
-        return firstRotation;
-    }
-
-    public void setFirstRotation(boolean firstRotation) {
-        this.firstRotation = firstRotation;
-    }
-
-    public boolean isReadingValue() {
-        return readingValue;
-    }
-
-    public void setReadingValue(boolean readingValue) {
-        this.readingValue = readingValue;
-    }
-
-    public long getStartTime() {
-        return startTime;
-    }
-
-    public void setStartTime(long startTime) {
-        this.startTime = startTime;
-    }
-
-    public long getRpmTimeStart() {
-        return rpmTimeStart;
-    }
-
-    public void setRpmTimeStart(long rpmTimeStart) {
-        this.rpmTimeStart = rpmTimeStart;
-    }
-
-    public int getRotations() {
-        return rotations;
-    }
-
-    public void setRotations(int rotations) {
-        this.rotations = rotations;
-    }
-
     public int getRpm() {
         return rpm;
     }
 
-    public void setRpm(int rpm) {
-        this.rpm = rpm;
+    public Speed getSpeed() {
+        return speed;
     }
 
 }
