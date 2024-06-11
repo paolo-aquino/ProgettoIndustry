@@ -379,7 +379,8 @@
                 "value": 80
               }
             ]
-          }
+          },
+          "unit": "rotrpm"
         },
         "overrides": []
       },
@@ -417,7 +418,7 @@
           "refId": "A"
         }
       ],
-      "title": "Media Velocità Nastro Trasportatore",
+      "title": "Velocità Media Nastro Trasportatore",
       "type": "stat"
     },
     {
@@ -446,7 +447,8 @@
                 "value": 80
               }
             ]
-          }
+          },
+          "unit": "rotrpm"
         },
         "overrides": []
       },
@@ -463,10 +465,10 @@
         "orientation": "auto",
         "reduceOptions": {
           "calcs": [
-            "lastNotNull"
+            "max"
           ],
-          "fields": "",
-          "values": false
+          "fields": "/^Value$/",
+          "values": true
         },
         "showThresholdLabels": false,
         "showThresholdMarkers": true,
@@ -479,11 +481,11 @@
             "type": "influxdb",
             "uid": "edj3oyshlem0wa"
           },
-          "query": "from(bucket: \"grafana_test\")\r\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\r\n  |> filter(fn: (r) => r._measurement == \"conveyor_speed\")\r\n  |> keep(columns: [\"_time\",\"_value\"])",
+          "query": "from(bucket: \"grafana_test\")\r\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\r\n  |> filter(fn: (r) => r._measurement == \"conveyor_speed\")\r\n  |> filter(fn: (r) => r.speed_cat == \"high_speed\" or r.speed_cat == \"low_speed\")\r\n  |> keep(columns: [\"_time\", \"_value\"])\r\n  |> sort(columns: [\"_time\"])\r\n  |> tail(n: 1)\r\n  |> max(column: \"_value\")",
           "refId": "A"
         }
       ],
-      "title": "RPM Nastro Trasportatore",
+      "title": "Velocità Nastro Trasportatore",
       "type": "gauge"
     },
     {
@@ -655,7 +657,34 @@
             ]
           }
         },
-        "overrides": []
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "is_okay"
+            },
+            "properties": [
+              {
+                "id": "mappings",
+                "value": [
+                  {
+                    "options": {
+                      "0": {
+                        "index": 1,
+                        "text": "Error"
+                      },
+                      "1": {
+                        "index": 0,
+                        "text": "Okay"
+                      }
+                    },
+                    "type": "value"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
       },
       "gridPos": {
         "h": 8,
@@ -705,6 +734,6 @@
   "timezone": "browser",
   "title": "Fabbrica di Biscotti",
   "uid": "adn9lpb768i68a",
-  "version": 4,
+  "version": 6,
   "weekStart": ""
 }
