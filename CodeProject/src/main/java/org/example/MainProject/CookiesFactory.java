@@ -42,6 +42,10 @@ public class CookiesFactory {
         conveyor.ledBlink();
     }
 
+    public boolean isCookieCrossing() {
+        return conveyor.isCookieCrossing();
+    }
+
     public boolean isOvenWorking() {
         return oven.isButtonWorking();
     }
@@ -51,7 +55,7 @@ public class CookiesFactory {
     }
 
     public void showStats() throws IOException {
-        display.showStats(oven.isButtonWorking(), conveyor.getRpm());
+        display.showStats(oven.isButtonWorking(), conveyor.getRpm(), conveyor.getCookiesCounter());
     }
 
     public void showMessage(String text, Object... args) throws IOException {

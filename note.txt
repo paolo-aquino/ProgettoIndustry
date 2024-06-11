@@ -1,0 +1,44 @@
+vecchio codice speed:
+
+/*
+        double distance = speedRanger.isValid() ? speedRanger.getValue() : 0;
+
+        System.out.println("DISTANCEEEE:" + distance);
+
+        if(firstRotation) {
+            if (distance <= DEFAULT_DISTANCE) {
+                readingValue = true;
+            } else if (readingValue) {
+                if(distance > DEFAULT_DISTANCE) {
+                    startTime = System.currentTimeMillis();
+                    firstRotation = false;
+                    readingValue = false;
+
+                    rpmTimeStart = startTime;
+                }
+            }
+        } else {
+            if(distance <= DEFAULT_DISTANCE) {
+                readingValue = true;
+            } else if (readingValue) {
+                if(distance > DEFAULT_DISTANCE) {
+                    long endTime = System.currentTimeMillis();
+                    long diff = endTime - startTime;
+
+                    double time = diff /1000.0;
+
+                    speed = (CIRCUMFERENCE/time * RADIUS) > DEFAULT_SPEED ? Speed.FAST : Speed.SLOW;
+
+                    startTime = System.currentTimeMillis();
+                    readingValue = false;
+
+                    rotations++;
+                    if(endTime - rpmTimeStart >= 30_000){
+                        rpm = rotations * 2;
+                        rotations = 0;
+                        rpmTimeStart = System.currentTimeMillis();
+                        speedSignal = true;
+                    }
+                }
+            }
+        }*/

@@ -26,8 +26,7 @@ public class CookiesFactorySimulator {
     public static void main(String[] args) throws Exception {
         Logger.getLogger("GrovePi").setLevel(Level.OFF);
         Logger.getLogger("RaspberryPi").setLevel(Level.OFF);
-        Logger.getLogger("Pi4J IO write").setLevel(Level.OFF);
-        Logger.getLogger("Pi4J IO read").setLevel(Level.OFF);
+        Logger.getLogger("org.iot.raspberry.grovepi.pi4j.IO").setLevel(Level.OFF);
 
         // Raspberry - Gp1
         GrovePi grovePi = new GrovePi4J();
@@ -35,17 +34,17 @@ public class CookiesFactorySimulator {
         // LCD display - I2C port
         SupsiRgbLcd lcd = new SupsiRgbLcd();
 
-        // Leds - Red and Blue - D2 and D3 ports
+        // Leds - Red and Blue - D2 and D4 ports
         SupsiLed redLight = new SupsiLed(grovePi, 2);
         SupsiLed blueLight = new SupsiLed(grovePi, 4);
 
-        // Ultrasonic ranger - D4 port
+        // Ultrasonic ranger - D6 port
         SupsiUltrasonicRanger speedRanger = new SupsiUltrasonicRanger(grovePi, 6);
 
-        // Ultrasonic ranger - D5 port
+        // Ultrasonic ranger - D7 port
         SupsiUltrasonicRanger counterRanger = new SupsiUltrasonicRanger(grovePi, 7);
 
-        // Button - D6 port
+        // Button - D3 port
         SupsiButton button = new SupsiButton(grovePi, 3);
 
         // Factory Object
@@ -71,8 +70,12 @@ public class CookiesFactorySimulator {
                 WRITE_API.writePoint(BUCKET, ORG, oven);
             }
 
-            factory.showStats();
+            if(factory.isCookieCrossing()) {
+                Point cookie = Point.measurement("counter").addField("count", 1).time(Instant.now(), WritePrecision.MS);
+                WRITE_API.writePoint(BUCKET, ORG, cookie);
+            }
 
+            factory.showStats();
         }
 
     }

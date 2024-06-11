@@ -27,31 +27,29 @@ public class Conveyor {
         }
     }
 
-    private static final int DEFAULT_DISTANCE = 10;
-    private static final double RADIUS = 0.04;
-    private static final double CIRCUMFERENCE = 2 * Math.PI * RADIUS;
-    private static final double DEFAULT_SPEED = 0.01;
+    private static final int DEFAULT_DISTANCE = 100;
+    private static final int COOKIE_DEFAULT_DISTANCE = 4;
+
     private boolean firstRotation;
-    private boolean readingValue;
-    //private long startTime;
-    private long rpmTimeStart;
-    private int rotations;
     private double rpm;
     private Speed speed;
-
-    private final SupsiLed redLight;
-    private final SupsiLed blueLight;
 
     private final SupsiUltrasonicRanger speedRanger;
     private boolean speedSignal;
 
-    private final SupsiUltrasonicRanger counterRanger;
+    private long startTime = 0;
+    private long endTime = 0;
+    private long initIntervalTime = 0;
+    private boolean isInLoop;
+    private List<Double> rpmList = new ArrayList<>();
 
-    long startTime = 0;
-    long endTime = 0;
-    long initIntervalTime = 0;
-    boolean isInLoop;
-    List<Double> rpmList = new ArrayList<Double>();
+    private final SupsiLed redLight;
+    private final SupsiLed blueLight;
+
+    private final SupsiUltrasonicRanger counterRanger;
+    private int cookiesCounter;
+    private boolean isReading;
+
 
     public Conveyor(final SupsiLed redLight, final SupsiLed blueLight, final SupsiUltrasonicRanger speedRanger, SupsiUltrasonicRanger counterRanger) {
         this.redLight = redLight;
@@ -61,10 +59,7 @@ public class Conveyor {
         speedSignal = false;
 
         firstRotation = true;
-        readingValue = false;
         startTime = 0;
-        rpmTimeStart = 0;
-        rotations = 0;
         rpm = 0;
         speed = Speed.SLOW;
 
@@ -99,9 +94,10 @@ public class Conveyor {
                 }
             }
 
-            if (System.currentTimeMillis() - initIntervalTime >= 5_000){
-                if (rpmList.size() != 0) {
+            if (System.currentTimeMillis() - initIntervalTime >= 5_000) {
+                if (!rpmList.isEmpty()) {
                     rpm = Collections.max(rpmList);
+                    speed = rpm > 30 ? Speed.FAST : Speed.SLOW;
                     speedSignal = true;
                     firstRotation = true;
                     rpmList.clear();
@@ -109,6 +105,24 @@ public class Conveyor {
             }
 
         }
+    }
+
+    public boolean isCookieCrossing() {
+        if(counterRanger.isValid())
+            System.out.println("BISCOTTIIIIII:: " + counterRanger.getValue());
+
+
+        if(counterRanger.isValid() && counterRanger.getValue() <= COOKIE_DEFAULT_DISTANCE) {
+            isReading = true;
+        } else if (isReading) {
+            if(counterRanger.isValid() && counterRanger.getValue() > COOKIE_DEFAULT_DISTANCE) {
+                cookiesCounter++;
+                isReading = false;
+                return true;
+            }
+        }
+
+        return false;
     }
 
     public boolean isSignalReady() {
@@ -138,6 +152,10 @@ public class Conveyor {
 
     public Speed getSpeed() {
         return speed;
+    }
+
+    public int getCookiesCounter() {
+        return cookiesCounter;
     }
 
 }
