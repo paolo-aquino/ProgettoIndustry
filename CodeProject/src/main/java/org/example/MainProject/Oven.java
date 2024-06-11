@@ -1,19 +1,35 @@
 package org.example.MainProject;
 
+import org.example.MyLibrary.SupsiButton;
 import org.iot.raspberry.grovepi.sensors.listener.GroveButtonListener;
 
+/**
+ * Class representing the Oven.
+ * <p>
+ * This class handles the oven operations including monitoring the button status
+ * and tracking button press events.
+ *
+ * @author Paolo Aquino
+ * @author Zeno Darani
+ * @author Matteo Cazzani
+ */
 public final class Oven {
 
-    private final GroveButtonListener groveButtonListener;
+    // Indicates if the button is working based on press duration
     private boolean isButtonWorking;
-    private long pressTime;
+
+    // Indicates if the button has been pressed
     private boolean isButtonPressed;
 
-    public Oven() {
+    // Tracks the time when the button was pressed
+    private long pressTime;
+
+    public Oven(final SupsiButton button) {
         isButtonWorking = false;
         isButtonPressed = false;
+        pressTime = 0;
 
-        groveButtonListener = new GroveButtonListener() {
+        final GroveButtonListener groveButtonListener = new GroveButtonListener() {
             @Override
             public void onRelease() {
                 long time = System.currentTimeMillis() - pressTime;
@@ -30,16 +46,24 @@ public final class Oven {
                 isButtonPressed = true;
             }
         };
+
+        button.setButtonListener(groveButtonListener);
     }
 
-    public GroveButtonListener getGroveButtonListener() {
-        return groveButtonListener;
-    }
-
+    /**
+     * Checks if the button is working.
+     *
+     * @return true if the button is working, false otherwise
+     */
     public boolean isButtonWorking() {
         return isButtonWorking;
     }
 
+    /**
+     * Checks if the button has been pressed and resets the press status.
+     *
+     * @return true if the button has been pressed, false otherwise
+     */
     public boolean isButtonPressed() {
         if(isButtonPressed) {
             isButtonPressed = false;

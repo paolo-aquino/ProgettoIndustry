@@ -1,5 +1,14 @@
 package org.example.MyLibrary;
 
+/**
+ * Enum representing various colors.
+ * <p>
+ * Each color is defined by its RGB (Red, Green, Blue) components.
+ *
+ * @author Paolo Aquino
+ * @author Zeno Darani
+ * @author Matteo Cazzani
+ */
 public enum Color {
     OFF(0,0,0),
     ON(255,192,203),
@@ -22,6 +31,7 @@ public enum Color {
     DARKGREEN(0,100,0),
     WHITE(255,255,255);
 
+    // RGB components of the color
     private final int r;
     private final int g;
     private final int b;

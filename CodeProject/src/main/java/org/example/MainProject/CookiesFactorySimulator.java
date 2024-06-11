@@ -13,6 +13,15 @@ import java.time.Instant;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+/**
+ * Main class for simulating the Cookies Factory process.
+ * <p>
+ * Group 4
+ *
+ * @author Paolo Aquino
+ * @author Zeno Darani
+ * @author Matteo Cazzani
+ */
 public class CookiesFactorySimulator {
     private static boolean acquisitionON = true;
 
@@ -23,7 +32,6 @@ public class CookiesFactorySimulator {
     public static void main(String[] args) throws Exception {
         Logger.getLogger("GrovePi").setLevel(Level.OFF);
         Logger.getLogger("RaspberryPi").setLevel(Level.OFF);
-        Logger.getLogger("org.iot.raspberry.grovepi.pi4j.IO").setLevel(Level.OFF);
 
         final InfluxDBClient client = InfluxDBClientFactory.create("http://169.254.193.89:8086", TOKEN.toCharArray());
         final WriteApiBlocking writeAPI = client.getWriteApiBlocking();
@@ -68,13 +76,14 @@ public class CookiesFactorySimulator {
 
             // If oven signal is ready then send data to Influx
             if(factory.isOvenSignalReady()) {
-                Point oven = Point.measurement("oven_door").addField("is_okay", factory.isOvenWorking()).time(Instant.now(), WritePrecision.MS);
+                final Point oven = Point.measurement("oven_door").addField("is_okay", factory.isOvenWorking())
+                        .time(Instant.now(), WritePrecision.MS);
                 writeAPI.writePoint(BUCKET, ORG, oven);
             }
 
             // If a cookie is crossing next to the sensor, then send data to Influx
             if(factory.isCookieCrossing()) {
-                Point cookie = Point.measurement("counter").addField("count", 1).time(Instant.now(), WritePrecision.MS);
+                final Point cookie = Point.measurement("counter").addField("count", 1).time(Instant.now(), WritePrecision.MS);
                 writeAPI.writePoint(BUCKET, ORG, cookie);
             }
 

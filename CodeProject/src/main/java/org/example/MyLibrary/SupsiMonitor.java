@@ -5,6 +5,10 @@ import org.iot.raspberry.grovepi.sensors.synch.SensorMonitor;
 /**
  * An interface for monitoring sensor values asynchronously.
  * @param <R> The type of sensor value
+ *
+ * @author Paolo Aquino
+ * @author Zeno Darani
+ * @author Matteo Cazzani
  */
 public interface SupsiMonitor<R> {
     /**

@@ -7,6 +7,10 @@ import org.iot.raspberry.grovepi.sensors.synch.SensorMonitor;
 /**
  * A custom ultrasonic ranger sensor implementation that extends GroveUltrasonicRanger and implements SupsiMonitor interface.
  * This sensor monitors distance asynchronously.
+ *
+ * @author Paolo Aquino
+ * @author Zeno Darani
+ * @author Matteo Cazzani
  */
 public final class SupsiUltrasonicRanger extends GroveUltrasonicRanger implements SupsiMonitor<Double> {
     private final SensorMonitor<Double> rangerMonitor;
@@ -14,7 +18,7 @@ public final class SupsiUltrasonicRanger extends GroveUltrasonicRanger implement
     /**
      * Constructs a SupsiUltrasonicRanger object with the specified GrovePi instance, pin number, and read interval.
      * @param grovePi The GrovePi instance to use for communication.
-     * @param pin The pin number to which the sensor is connected.
+     * @param pin The pin to which the sensor is connected.
      * @param readInterval The interval (in milliseconds) at which the sensor reads distance.
      */
     public SupsiUltrasonicRanger(final GrovePi grovePi, final int pin, final long readInterval) {
@@ -27,7 +31,7 @@ public final class SupsiUltrasonicRanger extends GroveUltrasonicRanger implement
      * Constructs a SupsiUltrasonicRanger object with the specified GrovePi instance and pin number.
      * Uses a default read interval of 100 milliseconds.
      * @param grovePi The GrovePi instance to use for communication.
-     * @param pin The pin number to which the sensor is connected.
+     * @param pin The pin to which the sensor is connected.
      */
     public SupsiUltrasonicRanger(final GrovePi grovePi, final int pin) {
         this(grovePi, pin, 10);
@@ -51,5 +55,4 @@ public final class SupsiUltrasonicRanger extends GroveUltrasonicRanger implement
     public String toString() {
         return rangerMonitor.toString();
     }
-
 }

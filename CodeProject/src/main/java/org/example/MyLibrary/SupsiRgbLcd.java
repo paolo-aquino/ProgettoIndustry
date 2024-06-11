@@ -10,6 +10,8 @@ import java.io.IOException;
  * Extends GroveRgbLcdPi4J for Raspberry Pi.
  *
  * @author Paolo Aquino
+ * @author Zeno Darani
+ * @author Matteo Cazzani
  */
 public final class SupsiRgbLcd extends GroveRgbLcdPi4J {
     private static final int CLEAR_DISPLAY = 0x01;
