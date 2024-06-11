@@ -85,6 +85,10 @@ public class Conveyor {
 
                     speed = (CIRCUMFERENCE/time * RADIUS) > DEFAULT_SPEED ? Speed.FAST : Speed.SLOW;
 
+                    System.out.println();
+                    System.out.println("SPEEEED:::" + speed);
+                    System.out.println();
+
                     startTime = System.currentTimeMillis();
                     readingValue = false;
 

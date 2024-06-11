@@ -14,7 +14,7 @@ public class CookiesFactory {
     private final Conveyor conveyor;
     private final Oven oven;
 
-    public CookiesFactory(final SupsiRgbLcd lcd, final SupsiLed redligth, final SupsiLed blueLight, final SupsiUltrasonicRanger speedRanger, final SupsiUltrasonicRanger counterRanger, final SupsiButton button) {
+    public CookiesFactory(final SupsiRgbLcd lcd, final SupsiLed redligth, final SupsiLed blueLight, final SupsiUltrasonicRanger speedRanger, final SupsiUltrasonicRanger counterRanger, final SupsiButton button) throws IOException {
         display = new Display(lcd);
         conveyor = new Conveyor(redligth, blueLight, speedRanger, counterRanger);
 
@@ -52,6 +52,10 @@ public class CookiesFactory {
 
     public void showStats() throws IOException {
         display.showStats(oven.isButtonWorking(), conveyor.getRpm());
+    }
+
+    public void showMessage(String text, Object... args) throws IOException {
+        display.showMessage(text, args);
     }
 
     public GroveButtonListener getGroveButtonListener() {

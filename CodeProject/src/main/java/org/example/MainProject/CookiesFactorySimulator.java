@@ -49,10 +49,9 @@ public class CookiesFactorySimulator {
         // Factory Object
         CookiesFactory factory = new CookiesFactory(lcd, redLight, blueLight, speedRanger, counterRanger, button);
 
-        while(true) {
-            // BlinkLED
-            factory.ledBlink();
+        factory.showMessage("Welcome To our Cookies Factory!");
 
+        while(true) {
             // Calculates the speed
             factory.speedCalculator();
             if(factory.isSpeedSignalReady()) {
@@ -61,10 +60,15 @@ public class CookiesFactorySimulator {
                 WRITE_API.writePoint(BUCKET, ORG, speedPoint);
             }
 
+            // BlinkLED
+            factory.ledBlink();
+
             if(factory.isOvenSignalReady()) {
                 Point oven = Point.measurement("oven_door").addField("is_okay", factory.isOvenWorking()).time(Instant.now(), WritePrecision.MS);
                 WRITE_API.writePoint(BUCKET, ORG, oven);
             }
+
+            factory.showStats();
 
         }
 

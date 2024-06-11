@@ -9,33 +9,25 @@ public class Display {
     private long lcdStartTime;
     private final SupsiRgbLcd lcd;
 
-    private boolean isOnWelcomeMessage;
-
-    public Display(final SupsiRgbLcd lcd) {
+    public Display(final SupsiRgbLcd lcd) throws IOException {
         lcdStartTime = System.currentTimeMillis();
-        isOnWelcomeMessage = true;
         this.lcd = lcd;
+        lcd.setRGB(Color.ON);
     }
 
     public void showStats(final boolean isButtonWorking, final int rpm) throws IOException {
         long time = System.currentTimeMillis() - lcdStartTime;
 
-//        if(time < 30_000 && isOnWelcomeMessage) {
-//            lcd.setText("Welcome to our Cookies Factory!");
-//            isOnWelcomeMessage = false;
-//        } else if (!isOnWelcomeMessage) {
-//            if(time )
-//        }
-
-        if(isButtonWorking) {
-            lcd.setRGB(Color.GREEN);
-            lcd.setTextf("Button is: %s", isButtonWorking ? "Working" : "NOT WORKING!");
-        } else {
-            lcd.setRGB(Color.RED);
-
+        if(time < 5_000) {
+            lcd.setTextf("The button is working: %b", isButtonWorking);
+        } else if (time < 10_000) {
+            lcd.setTextf("RPM: %d", rpm);
+            lcdStartTime = System.currentTimeMillis();
         }
 
-        if(rpm != 0)
-            lcd.setTextf("RPM: %d", rpm);
+    }
+
+    public void showMessage(String text, Object... args) throws IOException {
+        lcd.setTextf(text, args);
     }
 }
